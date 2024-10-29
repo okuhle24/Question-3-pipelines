@@ -42,9 +42,9 @@ jobs:
       
       - name: Copy build artifacts
         run: |
-          dotnet publish ./path/to/your/project.csproj -c Release -o ./publish
-          rm -rf "./Q3 CICD pipeline"
-          cp -r ./publish/* "./ pipeline-web-app"
+          dotnet publish  -c Release -o ./publish
+          rm -rf "./Question 3 pipeline"
+          cp -r ./publish/* .
       
       - name: Configure Git
         run: |
