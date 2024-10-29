@@ -26,7 +26,7 @@ jobs:
         run: dotnet restore
       
       - name: Build
-        run: dotnet build  --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release
       
       - name: Test
         run: dotnet test --no-build --verbosity normal --configuration Release
@@ -42,9 +42,15 @@ jobs:
       
       - name: Copy build artifacts
         run: |
-          dotnet publish  -c Release -o ./publish
-          rm -rf "./Question 3 pipeline"
-          cp -r ./publish/* .
+         
+          dotnet publish -c Release -o ./publish
+          
+          # Ensure the target directory exists
+          rm -rf "./Question 3 pipelines"
+          mkdir -p "./Question 3 pipelines" # Create the directory if it doesn't exist
+          
+          # Copy published files to the target directory
+          cp -r ./publish/* "./Question 3 pipeline/"
       
       - name: Configure Git
         run: |
