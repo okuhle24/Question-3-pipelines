@@ -1,67 +1,35 @@
-name: .NET pipeline web app
-
+name: CI Pipeline
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "master" ]
-
-permissions:
-  contents: write
+    branches:
+      - main
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js (or another language, e.g., Python, .NET)
+        uses: actions/setup-node@v2
         with:
-          dotnet-version: 8.0.x
-          
-      - name: Restore dependencies
-        run: dotnet restore
-      
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-      
-      - name: Test
-        run: dotnet test --no-build --verbosity normal --configuration Release
+          node-version: '14'  # or use .NET SDK or Java, etc.
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment: staging
+      - name: Install dependencies
+        run: npm install  # Change to dotnet restore for .NET apps
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Copy build artifacts
-        run: |
-         
-          dotnet publish -c Release -o ./publish
-          
-          # Ensure the target directory exists
-          rm -rf "./Question 3 pipelines"
-          mkdir -p "./Question 3 pipelines" # Create the directory if it doesn't exist
-          
-          # Copy published files to the target directory
-          cp -r ./publish/* "./Question 3 pipelines/"
-      
-      - name: Configure Git
-        run: |
-          git config --local user.email "20241846@ctucareer.co.za"
-          git config --local user.name "okuhle24"
-      
-      - name: Commit and push to staging
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git checkout -b staging || git checkout staging
-          git add .
-          git commit -m "Deploying to staging" || echo "No changes to commit."
-          git push origin staging # push to 'staging' branch
+      - name: Run tests
+        run: npm test  # Change to dotnet test for .NET apps
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ./test-results/*.xml
